@@ -120,10 +120,28 @@ class Data_generator():
         dump_doodle_cases(self.val_data,path+"/val_data")
         print("Data saved at : ",path)
 
+    # Flatten the data
+    def data_flatten(self):
+        self.tr_data = flatten(self.tr_data)
+        self.test_data = flatten(self.test_data)
+        self.val_data = flatten(self.val_data)
+        print("Data flattened")
+    
+
 # Load Data
-def load_data(path):
+def load_data(path,flat=False):
     tr_data = load_doodle_cases(path+"/tr_data")
     test_data = load_doodle_cases(path+"/test_data")
     val_data = load_doodle_cases(path+"/val_data")
     print("Data loaded from : ",path)
+    if flat:
+        tr_data = flatten(tr_data)
+        test_data = flatten(test_data)
+        val_data = flatten(val_data)
+        print("Data flattened")
     return tr_data, test_data, val_data
+
+# Flatten the data
+def flatten(data):
+    data = (np.array(data[0]).reshape(len(data[0]),-1),data[1],data[2],data[3],data[4])
+    return data

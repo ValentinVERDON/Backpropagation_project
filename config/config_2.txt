@@ -1,0 +1,4 @@
+GLOBALS
+data: data/1, loss: MSE, lrate: 0.03, wreg: 0.001, wrt: L1
+LAYERS
+size: 9, act: linear, wr: -0.1 0.1, br: 0 1

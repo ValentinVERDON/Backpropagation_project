@@ -2,8 +2,8 @@
 
 # ------------------- Imports ------------------- #
 
-
-
+import numpy as np
+from Doodler import *
 
 # ------------------- Functions ------------------- #
 
@@ -44,8 +44,34 @@ def read_config_file(file_path):
                     key, value = pair.split(':')
                     layer_info[key.strip()] = value.strip()
                 config["LAYERS"].append(layer_info)
+
+            # Modify the type of the values
+            for key in config["GLOBALS"]:
+                if key in ["lrate","wreg"]:
+                    config["GLOBALS"][key] = float(config["GLOBALS"][key])
+
+            for layer_info in config["LAYERS"]:
+                for key, value in layer_info.items():
+                    if key in ["size"]:
+                        layer_info[key] = int(value)
+                    elif key in ["lrate"]:
+                        layer_info[key] = float(value)
+                    elif key in ["wr", "br"]:
+                        if isinstance(value, str):
+                            layer_info[key] = [float(val) for val in value.split()]
                 
     if len(config["LAYERS"]) > 7:
         raise ValueError("Too many layers")
 
     return config
+
+def vizualisation_example(dataset,number=5):
+    
+    # pic number random index 
+    index = np.random.choice(range(len(dataset[0])),number)
+
+    # plot the pictures
+    for i in range(number):
+        image = dataset[0][index[i]]
+        label = dataset[2][index[i]]
+        quickplot_matrix(image, fs=None, title='Class = {}'.format(label))

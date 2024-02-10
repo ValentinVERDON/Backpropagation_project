@@ -1,0 +1,6 @@
+GLOBALS
+data: data/1, loss: MSE, lrate: 0.03, wreg: 0.001, wrt: L1
+LAYERS
+size: 15, act: relu, wr: -0.1 0.1, lrate: 0.01
+size: 10, act: sigmoid, wr: -0.1 0.1, lrate: 0.02
+size: 9, act: tanh, wr: -0.1 0.1, br: 0 1

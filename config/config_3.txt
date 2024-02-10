@@ -1,0 +1,8 @@
+GLOBALS
+data: data/2, loss: cross_entropy, lrate: 0.03, wreg: 0.001, wrt: L1
+LAYERS
+size: 50, act: relu, wr: -0.1 0.1, lrate: 0.01
+size: 30, act: relu, wr: -0.1 0.1, lrate: 0.01
+size: 20, act: sigmoid, wr: -0.1 0.1, lrate: 0.02
+size: 30, act: relu, wr: -0.1 0.1, lrate: 0.01
+size: 9, act: tanh, wr: -0.1 0.1, br: 0 1
