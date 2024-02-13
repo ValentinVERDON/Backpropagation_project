@@ -23,9 +23,14 @@ class Network():
         }
 
         # ------------------ Dictionnary Regularization Function ------------------
-        reg_function = {
+        reg_der_function = {
             "L1": lambda w: np.sign(w),
             "L2": lambda w: w
+        }
+
+        reg_function = {
+            "L1": lambda w: np.sum(np.abs(w)),
+            "L2": lambda w: np.sum(w**2)
         }
 
         # ------------------ Load the data ------------------
@@ -49,6 +54,7 @@ class Network():
         self.jacobian_loss_function = jacobian_loss_functions[global_config["loss"]]              # Loss function jacobian
         self.lrate = global_config["lrate"]             # Learning rate
         self.wreg = global_config["wreg"]               # Weight regularization
+        self.wrt_der_function = reg_der_function[global_config["wrt"]]                 # Weight regularization type
         self.wrt_function = reg_function[global_config["wrt"]]                 # Weight regularization type
 
         # Load the layers
@@ -123,12 +129,25 @@ class Network():
         jacob_loss = self.jacobian_loss_function(self.output, target)
 
         """
+        We correct the loss with the regularization term
+        """
+        # we list all the weights
+        weights = []
+        for layer in self.layers:
+            if layer.type != "softmax":
+                weights.append(layer.w.flatten())
+        weights = np.concatenate(weights)
+        
+
+        jacob_loss += self.wreg * self.wrt_function(weights)
+
+        """
         We follow the algorithm 6.4 from the book 
         """
         # We start from the last layer and go backward
         g =  jacob_loss
         for i in range(len(self.layers)-1,-1,-1):
-            g = self.layers[i].backward(g,self.wrt_function)
+            g = self.layers[i].backward(g,self.wrt_der_function)
 
     # ------------------ Update the weights ------------------
     def update(self):
@@ -189,7 +208,7 @@ class Network():
         plt.legend()
 
         if zoom :
-            plt.ylim(top=self.test_loss[len(self.test_loss)//factor])
+            plt.ylim(top=self.test_loss[len(self.test_loss)//factor-1])
             plt.xlim(left=len(self.test_loss)//factor)
 
         plt.show()

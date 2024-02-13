@@ -57,8 +57,8 @@ class Layer():
         return np.tanh(X)
     
     def softmax(self, X):
-        exps = np.exp(X - np.max(X))
-        return exps / np.sum(exps)
+        X_exp = np.exp(X)
+        return X_exp / np.sum(X_exp, axis=1, keepdims=True)
     
     def linear(self, X):
         return X
@@ -101,17 +101,23 @@ class Layer():
         if self.type != "softmax":
             # Converte the gradient of the layer's output into a gradient on the prenonlinearity activation
             # NOTE: it's Hadamard product
-            g = g * self.der_act(self.output)
+            a = np.dot(self.input,self.w) + self.bias
+            g = g * self.der_act(a)
 
             # Gradient of weights and bias
             self.grad_w = np.mean(np.einsum('ij,ik->ijk', self.input, g), axis=0) + self.wreg * wrt_function(self.w)
-            self.grad_bias = g.mean(axis=0)
+            self.grad_bias = g.mean(axis=0) + self.wreg * wrt_function(self.bias)
 
             # Propagate the gradient to the next layer
             g = np.dot(g, self.w.T)
 
         else:
-            pass
+            
+            jacobian_matrix = np.einsum('ij,ik->ijk', self.output, -self.output)
+            for i in range(jacobian_matrix.shape[0]):
+                jacobian_matrix[i, :, :] += np.diag(self.output[i, :])
+                
+            g = np.einsum('ij,ikj->ik', g, jacobian_matrix)
         
         return g
 
